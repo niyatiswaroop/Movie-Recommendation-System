@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# model files
+model/*.pkl
+
+# system files
+.DS_Store
+Thumbs.db
