@@ -37,9 +37,11 @@ TMDB 5000 Movie Dataset containing movie metadata such as genres, cast, crew, ke
 ## ⚙️ Installation
 
 Install the required libraries using pip:
+
 pip install pandas numpy scikit-learn nltk
 
 ## ▶️ How to run the Project
 
 First, run python build_model.py 
+
 Then run pyhton main.py
