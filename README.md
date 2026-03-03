@@ -2,46 +2,53 @@
 
 This project implements a content-based movie recommendation system that suggests movies similar to a given movie using metadata features such as genres, cast, crew, keywords, and overview. The system applies text preprocessing and natural language processing techniques to convert movie information into numerical feature vectors and computes similarity scores to generate recommendations.
 
+---
+
 ## 🚀 Features
 
-- Content-based filtering using movie metadata
-- Data preprocessing and feature engineering
-- NLP preprocessing including tokenization and stemming
-- Feature extraction using CountVectorizer
-- Similarity computation using cosine similarity
-- Top-5 movie recommendations based on similarity scores
-- Model optimization using pickle for faster loading
+- Content-based filtering using movie metadata  
+- NLP preprocessing (tokenization, stemming, lowercasing)  
+- Feature extraction using CountVectorizer  
+- Cosine similarity for recommendation generation  
+- Top 5 similar movie recommendations  
+- Interactive Streamlit frontend  
+- TMDB poster integration  
+- Optimized model loading using pickle  
+
+---
 
 ## 🧠 How It Works
 
-1. Movie and credits datasets are merged and cleaned.
-2. Relevant metadata is extracted and combined into a single text feature (**tags**).
-3. Text data is preprocessed using lowercasing and stemming.
-4. CountVectorizer converts text into numerical vectors.
-5. Cosine similarity is computed between movie vectors.
-6. The system returns the most similar movies for a given input title.
+1. Movie and credits datasets are merged.
+2. Relevant metadata is combined into a single **tags** feature.
+3. Text data is preprocessed and vectorized.
+4. Cosine similarity is computed between movie vectors.
+5. The system returns the most similar movies for a selected title.
+
+---
 
 ## 🛠️ Tech Stack
 
-- Python
-- Pandas
-- NumPy
-- Scikit-learn
-- NLTK
-- Pickle
+- Python  
+- Pandas  
+- NumPy  
+- Scikit-learn  
+- NLTK  
+- Streamlit  
+- Requests  
+- Pickle  
+
+---
 
 ## 📂 Dataset
 
-TMDB 5000 Movie Dataset containing movie metadata such as genres, cast, crew, keywords, and overview.
+TMDB 5000 Movie Dataset containing metadata such as genres, cast, crew, keywords, and overview.
+
+---
 
 ## ⚙️ Installation
 
-Install the required libraries using pip:
+Install required dependencies:
 
-pip install pandas numpy scikit-learn nltk
-
-## ▶️ How to run the Project
-
-First, run python build_model.py 
-
-Then run pyhton main.py
+```bash
+pip install -r requirements.txt
