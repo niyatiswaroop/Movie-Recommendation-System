@@ -1,4 +1,5 @@
 import pickle
+import pandas as pd
 
 movies = pickle.load(open('model/movies.pkl', 'rb'))
 similarity = pickle.load(open('model/similarity.pkl', 'rb'))
@@ -23,6 +24,18 @@ def recommend(movie):
     recommended_movies = []
 
     for i in rec_movies_list:
-        recommended_movies.append(movies.iloc[i[0]].title)
+        movie_row = movies.iloc[i[0]]
+
+        # Extract year safely
+        if pd.notna(movie_row.release_date):
+            year = movie_row.release_date[:4]
+        else:
+            year = "N/A"
+
+        recommended_movies.append({
+            "title": movie_row.title,
+            "rating": movie_row.vote_average,
+            "year": year
+        })
 
     return recommended_movies

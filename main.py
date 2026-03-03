@@ -7,4 +7,4 @@ results = recommend(movie_name)
 print("\nRecommended Movies:\n")
 
 for movie in results:
-    print(movie)
+    print(f"{movie['title']} (⭐ {movie['rating']} | {movie['year']})")

@@ -17,7 +17,7 @@ credits = pd.read_csv('data/tmdb_5000_credits.csv')
 
 movies = movies.merge(credits, on='title')
 
-movies = movies[['movie_id', 'title', 'overview', 'genres', 'keywords', 'cast', 'crew']]
+movies = movies[['movie_id', 'title', 'overview', 'genres', 'keywords', 'cast', 'crew', 'vote_average', 'release_date']]
 
 # checking missing values
 movies.dropna(inplace=True)
@@ -77,7 +77,7 @@ movies['crew'] = movies['crew'].apply(lambda x: [i.replace(" ", "") for i in x])
 movies['tags'] = movies['overview'] + movies['genres'] + movies['keywords'] + movies['cast'] + movies['crew']
 
 # creating a new dataframe with only the required columns
-preprocessed_df = movies[['movie_id','title','tags']].copy()
+preprocessed_df = movies[['movie_id','title','tags','vote_average','release_date']].copy()
 
 # converting the list into string - tags column
 preprocessed_df['tags'] = preprocessed_df['tags'].apply(lambda x: " ".join(x))

@@ -3,6 +3,7 @@ import pickle
 import requests 
 from dotenv import load_dotenv
 import os
+from recommender import recommend
 
 load_dotenv()
 
@@ -12,48 +13,34 @@ API_KEY = os.getenv("TMDB_API_KEY")
 movies = pickle.load(open('model/movies.pkl', 'rb'))
 similarity = pickle.load(open('model/similarity.pkl', 'rb'))
 
+# Fast lookup for movie_id (O(1) instead of dataframe filtering)
+movie_id_map = dict(zip(movies['title'], movies['movie_id']))
+
 @st.cache_data(show_spinner=False)
 def fetch_poster(movie_id):
+    if not API_KEY:
+        return None
+
     try:
-        url = f"https://api.themoviedb.org/3/movie/{movie_id}"
-        params = {
-            "api_key": API_KEY,
-            "language": "en-US"
-        }
+        response = requests.get(
+            f"https://api.themoviedb.org/3/movie/{movie_id}",
+            params={"api_key": API_KEY},
+            timeout=5  # reduced timeout for faster fail
+        )
 
-        response = requests.get(url, params=params, timeout=10)
+        if response.status_code != 200:
+            return None
 
-        if response.status_code == 200:
-            data = response.json()
-            poster_path = data.get("poster_path")
+        data = response.json()
+        poster_path = data.get("poster_path")
 
-            if poster_path:
-                return f"https://image.tmdb.org/t/p/w500/{poster_path}"
+        if not poster_path:
+            return None
 
+        return f"https://image.tmdb.org/t/p/w500/{poster_path}"
+
+    except requests.RequestException:
         return None
-
-    except:
-        return None
-
-def recommend(movie):
-    movie_index = movies[movies['title'] == movie].index[0]
-    distances = similarity[movie_index]
-
-    movies_list = sorted(
-        list(enumerate(distances)),
-        reverse=True,
-        key=lambda x: x[1]
-    )[1:6]
-
-    recommended_movies = []
-    recommended_posters = []
-
-    for i in movies_list:
-        movie_id = movies.iloc[i[0]].movie_id
-        recommended_movies.append(movies.iloc[i[0]].title)
-        recommended_posters.append(fetch_poster(movie_id))
-
-    return recommended_movies, recommended_posters
 
 st.set_page_config(
     page_title="Movie Recommender",
@@ -63,6 +50,17 @@ st.set_page_config(
 
 st.markdown("""
 <style>
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap');
+
+.section-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #E50914;
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
 
 /* Main background */
 .stApp {
@@ -167,7 +165,7 @@ st.markdown(
 
 st.write("")
 
-st.markdown("### 🎥 Choose a Movie")
+st.markdown('<div class="section-title">🎥 Choose a Movie</div>', unsafe_allow_html=True)
 
 selected_movie = st.selectbox(
     "",
@@ -176,35 +174,47 @@ selected_movie = st.selectbox(
 
 if st.button("Recommend"):
     with st.spinner("Finding best matches for you..."):
-        recommendations, posters = recommend(selected_movie)
+        results = recommend(selected_movie)
 
-    st.markdown("## Top Picks For You")
+    st.markdown('<div class="section-title">Top Picks For You</div>', unsafe_allow_html=True)
     st.write("")
 
     cols = st.columns(5)
-    placeholder_path = "assets/placeholder.jpg"
 
     for idx, col in enumerate(cols):
         with col:
-            image_url = posters[idx] if posters[idx] else None
+            movie = results[idx]
 
-            if image_url:
+            poster = fetch_poster(movie_id_map[movie['title']])
+
+            # Poster
+            if poster:
                 st.markdown(
                     f"""
                     <div class="movie-card">
-                        <img src="{image_url}" class="movie-poster"/>
+                        <img src="{poster}" class="movie-poster"/>
                     </div>
                     """,
                     unsafe_allow_html=True
                 )
             else:
-                # For local placeholder image
                 st.image("assets/placeholder.jpg", use_container_width=True)
 
+            # Title
             st.markdown(
                 f"""
                 <div class="movie-title">
-                    {recommendations[idx]}
+                    {movie['title']}
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            # Rating + Year
+            st.markdown(
+                f"""
+                <div class="movie-meta">
+                    ⭐ {movie['rating']} | {movie['year']}
                 </div>
                 """,
                 unsafe_allow_html=True
