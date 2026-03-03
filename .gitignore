@@ -9,3 +9,5 @@ model/*.pkl
 # system files
 .DS_Store
 Thumbs.db
+
+.env
